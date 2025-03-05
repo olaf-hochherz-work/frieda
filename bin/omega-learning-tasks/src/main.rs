@@ -109,7 +109,10 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Threshold(_thres, learned)) => {
+                    Err(SproutError::Threshold {
+                        thres: _thres,
+                        aut: learned,
+                    }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "task {i} \"{:?}\" exceeded threshold after {} ms",
@@ -122,7 +125,7 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Timeout(partial)) => {
+                    Err(SproutError::Timeout { aut: partial }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "exceeded timeout on task {i} with partial ts of size {}: {:?}",
@@ -152,7 +155,10 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Threshold(_thres, learned)) => {
+                    Err(SproutError::Threshold {
+                        thres: _thres,
+                        aut: learned,
+                    }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "task {i} \"{:?}\" exceeded threshold after {} ms",
@@ -165,7 +171,7 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Timeout(partial)) => {
+                    Err(SproutError::Timeout { aut: partial }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "exceeded timeout on task {i} with partial ts of size {}: {:?}",

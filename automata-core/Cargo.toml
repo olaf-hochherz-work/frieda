@@ -13,7 +13,7 @@ keywords = [
 ]
 categories = ["mathematics", "science"]
 license = "MIT or Apache-2.0"
-edition = "2021"
+edition = "2024"
 homepage = "https://github.com/leonbohn/automata"
 authors = ["León Bohn <bohn@lics.rwth-aachen.de>"]
 
