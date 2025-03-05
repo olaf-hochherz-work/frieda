@@ -3,14 +3,14 @@ use std::fmt::Debug;
 use super::fwpm::FWPM;
 use automata::automaton::{DFA, DPA};
 use automata::core::alphabet::{Alphabet, Matcher};
-use automata::core::{math, Int, Show, Void};
+use automata::core::{Int, Show, Void, math};
 use automata::representation::CollectTs;
 use automata::ts::{
     Deterministic, EdgeExpression, ForAlphabet, IsEdge, Sproutable, StateColor, StateIndex,
 };
 use automata::{
+    DTS, Pointed, RightCongruence, TransitionSystem,
     dot::{DotStateAttribute, DotTransitionAttribute, Dottable},
-    Pointed, RightCongruence, TransitionSystem, DTS,
 };
 use itertools::Itertools;
 use tracing::{debug, info};
@@ -272,14 +272,19 @@ impl<A: Alphabet, const N: usize> TransitionSystem for PreciseDPA<A, N> {
 
     type EdgeColor = Int;
 
-    type EdgeRef<'this> = PreciseDPATransition<'this, A, N>
+    type EdgeRef<'this>
+        = PreciseDPATransition<'this, A, N>
     where
         Self: 'this;
 
-    type EdgesFromIter<'this> = PreciseDPAEdgesFrom<'this, A, N>
+    type EdgesFromIter<'this>
+        = PreciseDPAEdgesFrom<'this, A, N>
     where
         Self: 'this;
-    type StateIndices<'this> = automata::ts::Reachable<'this, Self, false> where Self: 'this;
+    type StateIndices<'this>
+        = automata::ts::Reachable<'this, Self, false>
+    where
+        Self: 'this;
 
     type Alphabet = A;
 
@@ -369,7 +374,7 @@ impl<A: Alphabet, const N: usize> PreciseDPA<A, N> {
     }
 
     /// Given a [`PState`], returns an iterator over the DFAs that are currently active.
-    pub fn dfas<'a>(&'a self, q: &'a PState<N>) -> impl Iterator<Item = &DFA<A>> + 'a {
+    pub fn dfas<'a>(&'a self, q: &'a PState<N>) -> impl Iterator<Item = &'a DFA<A>> + 'a {
         q.progress_classes()
             .enumerate()
             .map(move |(i, c)| &self.dfas[c as usize][i])
@@ -512,9 +517,9 @@ impl<A: Alphabet, const N: usize> Dottable for PreciseDPA<A, N> {
 
 #[cfg(test)]
 mod tests {
-    use automata::core::alphabet::CharAlphabet;
     use automata::core::Void;
-    use automata::{TransitionSystem, DTS};
+    use automata::core::alphabet::CharAlphabet;
+    use automata::{DTS, TransitionSystem};
 
     use super::PreciseDPA;
 

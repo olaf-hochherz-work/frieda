@@ -2,36 +2,42 @@
 mod consistency;
 pub use consistency::*;
 
-use automata::{automaton::WithoutCondition, random, ts::path, Pointed, TransitionSystem, DTS};
+use automata::{DTS, Pointed, TransitionSystem, automaton::WithoutCondition, random, ts::path};
 use itertools::Itertools;
 use tracing::{error, info, trace, warn};
 
 use crate::prefixtree::prefix_tree;
 use automata::automaton::{Automaton, WithInitial};
+use automata::core::Void;
 use automata::core::alphabet::CharAlphabet;
 use automata::core::word::OmegaWord;
-use automata::core::Void;
-use automata::ts::{run, Deterministic, Shrinkable, Sproutable};
+use automata::ts::{Deterministic, Shrinkable, Sproutable, run};
 use std::{collections::HashSet, fmt::Debug, path::Iter};
 
 use super::OmegaSample;
 
 #[derive(thiserror::Error)]
 pub enum SproutError<A: ConsistencyCheck<WithInitial<DTS>>> {
-    #[error("timeout was exceeded, bailing with ts of size {}", .0.size())]
-    Timeout(Automaton<CharAlphabet, WithoutCondition, Void, Void>),
-    #[error("escape prefix threshold `{0}` exceeded, bailing with ts of size {}", .1.size())]
-    Threshold(usize, A::Aut),
+    #[error("timeout was exceeded, bailing with ts of size {}", aut.size())]
+    Timeout {
+        aut: Automaton<CharAlphabet, WithoutCondition, Void, Void>,
+    },
+    #[error("escape prefix threshold `{0}` exceeded, bailing with ts of size {}", aut.size())]
+    Threshold { thres: usize, aut: A::Aut },
 }
 
 impl<A: ConsistencyCheck<WithInitial<DTS>>> Debug for SproutError<A> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use SproutError::*;
         write!(
             f,
             "{}",
             match self {
-                SproutError::Timeout(ts) => "reached timeout".to_string(),
-                SproutError::Threshold(t, ts) => format!("reached threshold {t}"),
+                Timeout { aut } => "reached timeout".to_string(),
+                Threshold { thres, aut } => format!(
+                    "exceeded threshold {thres} with automaton of size {}",
+                    aut.size()
+                ),
             }
         )
     }
@@ -65,7 +71,9 @@ pub fn sprout<A: ConsistencyCheck<WithInitial<DTS>>>(
     let mut mut_sample = sample.clone();
 
     'outer: loop {
-        trace!("attempting to find an escape prefix with sets\npos {pos_sets:?}, neg {neg_sets:?}\n{mut_sample:?}\n{ts:?}");
+        trace!(
+            "attempting to find an escape prefix with sets\npos {pos_sets:?}, neg {neg_sets:?}\n{mut_sample:?}\n{ts:?}"
+        );
         let Some(escape_prefix) = ts.omega_escape_prefixes(mut_sample.positive_words()).min()
         else {
             break;
@@ -78,7 +86,7 @@ pub fn sprout<A: ConsistencyCheck<WithInitial<DTS>>>(
                 "task exceeded timeout, aborting with automaton of size {}",
                 ts.size()
             );
-            return Err(SproutError::Timeout(ts));
+            return Err(SproutError::Timeout { aut: ts });
         }
         // check thresh
         if (escape_prefix.len() as isize) - 2 > thresh {
@@ -87,10 +95,10 @@ pub fn sprout<A: ConsistencyCheck<WithInitial<DTS>>>(
                 ts.size()
             );
             // compute default automaton
-            return Err(SproutError::Threshold(
-                thresh as usize,
-                acc_type.default_automaton(&sample),
-            ));
+            return Err(SproutError::Threshold {
+                thres: thresh as usize,
+                aut: acc_type.default_automaton(&sample),
+            });
         }
 
         let source = ts.reached_state_index(&escape_prefix).unwrap();
@@ -144,11 +152,11 @@ impl OmegaSample {
 mod tests {
     use super::*;
     use crate::passive::OmegaSample;
+    use automata::DTS;
     use automata::automaton::{BuchiCondition, MinEvenParityCondition};
     use automata::core::alphabet::CharAlphabet;
-    use automata::core::{upw, Void};
+    use automata::core::{Void, upw};
     use automata::ts::Sproutable;
-    use automata::DTS;
     use std::collections::HashSet;
 
     #[test]
@@ -215,7 +223,8 @@ mod tests {
             .default_color(Void)
             .into_dba(0);
 
-        let Err(SproutError::Threshold(t, res)) = sprout(sample, BuchiCondition) else {
+        let Err(SproutError::Threshold { thres: t, aut: res }) = sprout(sample, BuchiCondition)
+        else {
             panic!("expected to hit threshold");
         };
         assert_eq!(res, dba);
@@ -275,7 +284,9 @@ mod tests {
             .into_dpa(0);
         dpa.complete_with_colors(Void, 1);
 
-        let Err(SproutError::Threshold(t, res)) = sprout(sample, MinEvenParityCondition) else {
+        let Err(SproutError::Threshold { thres: t, aut: res }) =
+            sprout(sample, MinEvenParityCondition)
+        else {
             panic!("expected threshold to be exceeded");
         };
         assert_eq!(res, dpa);

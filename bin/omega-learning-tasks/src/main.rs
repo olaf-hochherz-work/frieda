@@ -2,24 +2,24 @@ use csv::Writer;
 use itertools::{Either, Itertools};
 use rayon::prelude::*;
 use std::{collections::HashMap, env, fs, path::PathBuf, time::Duration};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
+use tracing_subscriber::{Layer, layer::SubscriberExt, util::SubscriberInitExt};
 
-use automata::automaton::{BuchiCondition, MinEvenParityCondition, Semantics, DBA, DPA};
+use automata::automaton::{BuchiCondition, DBA, DPA, MinEvenParityCondition, Semantics};
 use automata::core::alphabet::{Alphabet, CharAlphabet};
 use automata::core::word::{OmegaWord, ReducedOmegaWord};
-use automata::core::{math, upw, Color, Void};
+use automata::core::{Color, Void, math, upw};
 use automata::representation::CollectTs;
-use automata::ts::run::InfiniteObserver;
 use automata::ts::Deterministic;
+use automata::ts::run::InfiniteObserver;
 use automata::{
+    DTS, TransitionSystem,
     automaton::InfiniteWordAutomaton,
     hoa::WriteHoa,
     random::{generate_random_dba, generate_random_dpa, generate_random_omega_words},
-    TransitionSystem, DTS,
 };
 use automata_learning::passive::{
-    sprout::{sprout, SproutError},
     OmegaSample,
+    sprout::{SproutError, sprout},
 };
 use tracing::{info, warn};
 
@@ -109,7 +109,10 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Threshold(_thres, learned)) => {
+                    Err(SproutError::Threshold {
+                        thres: _thres,
+                        aut: learned,
+                    }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "task {i} \"{:?}\" exceeded threshold after {} ms",
@@ -122,7 +125,7 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Timeout(partial)) => {
+                    Err(SproutError::Timeout { aut: partial }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "exceeded timeout on task {i} with partial ts of size {}: {:?}",
@@ -152,7 +155,10 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Threshold(_thres, learned)) => {
+                    Err(SproutError::Threshold {
+                        thres: _thres,
+                        aut: learned,
+                    }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "task {i} \"{:?}\" exceeded threshold after {} ms",
@@ -165,7 +171,7 @@ pub fn run_sprout() {
                         );
                         export_sprout_result(dir, &learned, elapsed);
                     }
-                    Err(SproutError::Timeout(partial)) => {
+                    Err(SproutError::Timeout { aut: partial }) => {
                         let elapsed = time.elapsed();
                         info!(
                             "exceeded timeout on task {i} with partial ts of size {}: {:?}",
@@ -455,7 +461,9 @@ pub fn set_name(
     acc_type: &str,
 ) -> String {
     let class = if train { "train" } else { "test" };
-    format!("data/sets/word_set__{acc_type}__aut_size={aut_size}__sample_size={set_size}__{set_index:0>2}_{class}.csv")
+    format!(
+        "data/sets/word_set__{acc_type}__aut_size={aut_size}__sample_size={set_size}__{set_index:0>2}_{class}.csv"
+    )
 }
 
 pub fn export_labelled_set(file: String, set: &[(ReducedOmegaWord<char>, bool)]) {
@@ -503,7 +511,9 @@ pub fn task_name(
     set_index: usize,
     acc_type: String,
 ) -> String {
-    format!("{acc_type}_task__aut_size={aut_size:0>2}__sample_size={set_size:0>5}__{acc_type}{aut_index:0>2}__sample{set_index:0>2}")
+    format!(
+        "{acc_type}_task__aut_size={aut_size:0>2}__sample_size={set_size:0>5}__{acc_type}{aut_index:0>2}__sample{set_index:0>2}"
+    )
 }
 
 pub fn export_settings(

@@ -10,8 +10,8 @@ mod value;
 
 pub mod label;
 pub use label::{
-    build_vars, AbstractLabelExpression, HoaAlphabet, HoaExpression, HoaRepr, HoaSymbol, Label,
-    LabelExpression, MAX_APS,
+    AbstractLabelExpression, HoaAlphabet, HoaExpression, HoaRepr, HoaSymbol, Label,
+    LabelExpression, MAX_APS, build_vars,
 };
 
 use tracing::warn;
@@ -24,7 +24,7 @@ use ariadne::{Color, Fmt, ReportKind, Source};
 use chumsky::prelude::*;
 pub use format::*;
 
-use chumsky::{prelude::Simple, Parser};
+use chumsky::{Parser, prelude::Simple};
 pub use format::{
     AcceptanceCondition, AcceptanceInfo, AcceptanceName, AcceptanceSignature, AliasName, Property,
 };
@@ -336,7 +336,7 @@ impl std::fmt::Display for AbstractLabelExpression {
 fn build_error_report<I: Iterator<Item = Simple<String>>>(input: &str, errs: I) -> String {
     errs.into_iter()
         .map(|e| {
-            let report = ariadne::Report::build(ReportKind::Error, (), e.span().start);
+            let report = ariadne::Report::build(ReportKind::Error, e.span());
 
             let report = match e.reason() {
                 chumsky::error::SimpleReason::Unexpected => report
@@ -453,11 +453,11 @@ mod tests {
     use tracing::error;
 
     use crate::{
+        AcceptanceAtom, AcceptanceCondition, AcceptanceName, AcceptanceSignature, Body, HeaderItem,
+        HoaRepresentation, StateConjunction,
         body::{Edge, State},
         header::Header,
         label::AnonymousAbstract,
-        AcceptanceAtom, AcceptanceCondition, AcceptanceName, AcceptanceSignature, Body, HeaderItem,
-        HoaRepresentation, StateConjunction,
     };
 
     #[test]
