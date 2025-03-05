@@ -1,5 +1,5 @@
-use automata::hoa::WriteHoa;
 use automata::TransitionSystem;
+use automata::hoa::WriteHoa;
 use tracing::{debug, info, trace};
 use tracing_subscriber::{filter, prelude::*};
 
