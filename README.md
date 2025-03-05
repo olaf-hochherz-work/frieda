@@ -1,9 +1,10 @@
-*FRIEDA* is an acronym for : **FR**amework for **I**nference and **E**xperimentation with **D**eterministic **A**utomata.
-It is a comprehensive Rust-based framework for working with automata, transition systems, and automata learning algorithms. The project provides a collection of crates that enable implementation, inference, and experimentation with deterministic automata and related formal models.
+<a href="https://frieda.photos" alt="more photos of Frieda"><img src="assets/alpha.jpg" alt="FRIEDA Logo" width="250" align="left" style="margin-right:20px" /></a>
 
-<p align="center">
-  <a href="https://frieda.photos" alt="more photos of Frieda"><img src="assets/alpha.jpg" alt="FRIEDA Logo" width="250"/></a>
-</p>
+
+### *FRIEDA* <img src="https://github.com/leonbohn/frieda/actions/workflows/rust.yml/badge.svg" align="right" />
+
+ is an acronym for : **FR**amework for **I**nference and **E**xperimentation with **D**eterministic **A**utomata.
+It is a comprehensive Rust-based framework for working with automata, transition systems, and automata learning algorithms. The project provides crates for implementation, inference, and experimentation with deterministic automata and related models.
 
 Since I am mad for my dog, an Australian Shepherd with the name Frieda, I obviously use her as inspiration for the name.
 And of course it gives me a semi-good reason to show off how cute she is.
@@ -101,4 +102,3 @@ For questions, suggestions, or collaboration opportunities, please open an issue
 <p align="right">
 ❤️
 </p>
-
