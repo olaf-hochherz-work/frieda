@@ -7,5 +7,5 @@ edition = "2024"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
-automata = { path = "../../automata" }
+automata = { path = "../../crates/automata" }
 clap = "4.5.31"

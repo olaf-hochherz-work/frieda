@@ -2,8 +2,8 @@
 # we use the 2024 edition resolver
 resolver = "3"
 
-members = ["automata", "automata-learning", "automata-core", "bin/*", "hoars"]
-default-members = ["automata", "automata-*", "hoars", "bin/*"]
+members = ["crates/*", "bin/*"]
+default-members = ["crates/automata", "crates/automata-*", "crates/hoars", "bin/*"]
 exclude = ["python", "bench"]
 
 [workspace.dependencies]
