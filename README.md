@@ -24,13 +24,15 @@ Representation of standard acceptance conditions and automata types based on the
 - **Hanoi Omega-Automata (HOA) format**: Support for parsing automata that are given in [HOA](https://adl.github.io/hoaf/), and for outputting automata in HOA.
 - **Python Bindings**: Use *FRIEDA*'s functionality from Python (hopefully coming at some point)
 
-This repository consists of several interconnected crates, which we list out and briefly describe now:
+This repository consists of several interconnected crates, which we list out below.
+Unsurprisingly, they can be found in the `crates` subdirectory.
 
 - `automata-core`: Core data structures and traits for working with transition systems and automata
 - `automata`: Main package with high-level automata functionality. This crate also defines common acceptance conditions and provides structs combining transition systems with them.
 - `automata-learning`: Implementations of automata learning algorithms, this includes active and passive algorithms.
 - `hoars`: Support for the [HOA format](https://adl.github.io/hoaf/) through which omega-automata can be represented.
-- `python`: Python bindings (that will hopefully be implemented soon)
+
+Additionally, it is planned to have Python bindings at some point in the future, they will be stored in the `python` subdirectory.
 
 ## Quick Start
 
@@ -45,7 +47,7 @@ automata = "0.1.0"
 ```
 
 To see how you can quickly start working with the libraries, check out the crate specific documentations.
-You can find them by either navigating to the appropriate subdirectories or by clicking on the appropriate link: [automata](automata/README.md), [automata-learning](automata-learning/README.md)
+You can find them by either navigating to the appropriate subdirectories or by clicking on the appropriate link: [automata](crates/automata/README.md), [automata-learning](crates/automata-learning/README.md)
 
 ## Command Line Tools
 
