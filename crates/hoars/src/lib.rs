@@ -187,7 +187,7 @@ impl HoaRepresentation {
         })
     }
 
-    /// Returns the number of edges in the automaton.
+    /// Returns the start state conjunction.
     pub fn start(&self) -> Vec<&StateConjunction> {
         debug_assert!(
             self.header()
